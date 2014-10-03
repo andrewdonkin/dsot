@@ -1,0 +1,1 @@
+povray +w1024 +h768 +GS +P -d +q9 -a0.1 -j +am2 +r5 +HTN -V -GA -GS -GD +HNcpu.png DECLARE=NO_AREA_LIGHTS=1 +sp32 +ep4 +d +KFF100 +q9 +a0.1 +am2 +r3 -D +idsot.pov +odsot.png +SF1 +EF30 +C

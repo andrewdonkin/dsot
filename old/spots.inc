@@ -26,13 +26,13 @@
   texture {pigment {Grey} finish {ambient 0.04 specular 0.9 metallic}}
 };
 
-#declare WhiteSpotBulb = light_source {origin color White spotlight point_at x
+#declare WhiteSpotBulb = light_source {0 color White spotlight point_at x
   radius SpotLightRad tightness SpotLightTight falloff SpotLightFall};
 
-#declare GreenSpotBulb = light_source {origin color Green spotlight point_at x
+#declare GreenSpotBulb = light_source {0 color Green spotlight point_at x
   radius SpotLightRad tightness SpotLightTight falloff SpotLightFall};
 
-#declare OrangeSpotBulb = light_source {origin color Orange spotlight
+#declare OrangeSpotBulb = light_source {0 color Orange spotlight
   point_at x
   radius SpotLightRad
   tightness SpotLightTight
@@ -48,7 +48,7 @@
   
 };
 
-#declare RedSpotBulb = light_source {origin color rgb <1, 0, 0> spotlight point_at x
+#declare RedSpotBulb = light_source {0 color rgb <1, 0, 0> spotlight point_at x
 	radius SpotLightRad tightness SpotLightTight falloff SpotLightFall
   looks_like {
     sphere {x/2 SpotRad/3

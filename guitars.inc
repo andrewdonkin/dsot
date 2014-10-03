@@ -807,6 +807,7 @@
 
 //#####################################################################
 // Ibanez effects box.  60x120mm, about 50mm high.  Pedal 75mm.
+// CP-9 in AD-9 colour.  Should fix that.
 #macro ibanez() union {
     #local led_v = <0.03, 0.036, 0.112>;
     #local ibanez_colr = rgbft <1, 0, 0.9, 0, 0>;
@@ -942,7 +943,7 @@
 	      finish {specular 0.9 roughness 0.002 reflection 0.1}
 	    }
 	    texture {
-	      pigment { image_map { png "ibanez_plate_map.png" map_type 0 interpolate 2 once } rotate 90*x }
+	      pigment { image_map { png "ibanez_plate_map_ad9.png" map_type 0 interpolate 2 once } rotate 90*x }
 	      scale <0.044, 1, 0.021> translate <-0.022, 0, 0.0055>
 	    }
 	    texture { // grubbiness at the rear of the Ibanez nameplate
@@ -1253,7 +1254,7 @@
 */
 //  #include "stage.inc" object{grille(<1.8, -0.02, 2>) scale 0.2 translate <-0.22, 0, -0.1>}
 
-  #if(1)
+  #if(0)
     global_settings {
       max_trace_level 15
       assumed_gamma 1
@@ -1283,13 +1284,13 @@
     }
 //    camera {location <-0.27, 0.3, -0.13> look_at <-0.06,0,0.1> angle 50} // Good of all
 //    camera {location <-0.04, 0.2, -0.1> look_at <0.08,0.0,0.10>} // close up tube driver
-    camera {location <0, 0.07, -0.15> look_at 0}
+//    camera {location <0, 0.07, -0.15> look_at 0} // close up top right corner
 //    camera {location <-0.04, 0.1, -0.1> look_at <0.08,0.0,0.10>} // tube driver clipping?
 //    camera {location <-0.15, 0.2, 0.03> look_at <-0.04,0.0,0.09> angle 50 } // close up ge-7
 //    camera {location <-0.23, 0.2, 0.03> look_at <-0.12,0.0,0.09> angle 50 } // close up cs-2
 //    camera {location <-0.13, 1, 0.13> look_at <-0.13, 0, 0.13> angle 5} // knobs
 //    camera {location <-0.15, 0.2, 0.03> look_at <-0.03,0.03,0.14> angle 10 } // close up LED
-//    camera {location <-0.35, 0.15, +0.13> look_at <-0.20,0,0.09> angle 40} // Ibanez CP-9
+    camera {location <-0.15, 0.25, -0.03> look_at <-0.10,0,0.19> angle 40} // Ibanez CP-9
 //    camera {location <-0.32, 0.15, 0> look_at <-0.22,0.03,0.08> angle 45 } // Ibanez knobs
 //    camera {location <-0.32, 0.15, 0.2> look_at <-0.22,0.03,0.15> angle 45 } // Ibanez cables
     // Matches ibanezad9-plan.jpg with ibanez() translate <-0.25, 0, 0.03>:
@@ -1299,11 +1300,11 @@
       #if(!NO_AREA_LIGHTS) area_light x/10, y/10, 10, 10 adaptive 1 orient circular #end
     }
 
-    object {stompbox(rgb <1, 0.3, 0>) translate <-0.04, 0, -0.08>  rotate -40*y}// translate <-0.08, 0, -0.1>}
+//    object {stompbox(rgb <1, 0.3, 0>) translate <-0.04, 0, -0.08>  rotate -40*y}// translate <-0.08, 0, -0.1>}
 //    object {bossge7() translate <-0.04, 0, -0.08>  rotate 140*y}// translate <-0.08, 0, -0.1>}
 //    object {tubedriver(rgb <1, 0.4, 0>) translate <0, 0, 0.0>}
 //    object {bossge7() translate <-0.08, 0, -0.06> }
-//    object {ibanez() translate <-0.1, 0, 0.09> }
+    object {ibanez() translate <-0.1, 0, 0.09> }
 //    object {bosscs2() translate <-0.19, 0, 0.02> }
   #end
 
