@@ -1,3 +1,5 @@
+// Illustrates peculiar behaviour of cylindrical lights in media.
+
 camera {
   location <0, 0.5, -1> look_at y/3
 }

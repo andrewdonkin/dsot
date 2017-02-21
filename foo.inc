@@ -1,3 +1,5 @@
+// Snapshot of stage.inc at some point.  No longer useful.
+
 // The proscenium alone was 85 foot high by 98 foot wide.
 
 // Based on {stage_layout,layout_sightlines}.jpg):

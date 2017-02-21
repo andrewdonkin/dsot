@@ -1,3 +1,5 @@
+// Test jig for rendering the whole stage
+
 #include "dsot.inc"
 #include "stage.inc"
 #include "vl2c.inc"

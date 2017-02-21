@@ -1,3 +1,6 @@
+// This looks like an early idea for a cymbal.
+// No longer useful.
+
 #include "colors.inc"
 
 light_source { <50, 70, -100> White }

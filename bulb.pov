@@ -1,3 +1,6 @@
+// Beginnings of an idea for a light bulb,
+// hundreds of which go in the banks below the stage.
+// No longer useful.
 camera {location <0, 0.05, -0.5> look_at 0}
 
 light_source {<10, 10, -10> rgb 1}

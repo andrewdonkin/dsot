@@ -1,4 +1,6 @@
-/*
+/* This work is licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License.
+ * To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/
 
 Nick's kits:
 
@@ -589,9 +591,9 @@ of the Moon and The Wall.
 #macro nick(xlate_v)
   union {
     union {
-      // transparent/lucent slabs Nick's and his kit sits on.  Must be like
+      // transparent/lucent slabs Nick and his kit sits on.  Must be like
       // sitting on the surface of the sun when the banks undereath hit it.
-      // but this is 2014 now and Pov 3.7 has a second parameter to
+      // But this is 2014 now and Pov 3.7 has a second parameter to
       // "diffuse" for diffusely transparent objects.  TODO - try that or double_illuminate
       box {<-1.4, 0, 0.5> <0, 0.01, -1.7>}
       box {<0.007, 0, 0.5> <1.25, 0.01, -1.7>}

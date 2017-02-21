@@ -1,8 +1,10 @@
+// And old test jig for Nick's kit.
 // #declare CHEAP_MUSIC=1;
 
 #include "colors.inc"
+#include "dsot.inc"
 #include "drums.inc"
-#include "cymbals.inc"
+//#include "cymbals.inc"
 
 global_settings {
 //  ambient_light rgb 0.08
@@ -38,4 +40,4 @@ camera {location 16*z rotate <-45, -30, 0> look_at <0.3, 0.6, 0> angle 17}
 // camera {location 2*z rotate <-25, -60, 0> look_at <0, 0.8, -1>} // collisions
 // camera {location <0, 1, -6> look_at <0, 0.6, 0.2> angle 35} // dscn1751
 
-nick()
+nick(0)
