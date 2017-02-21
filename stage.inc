@@ -1,3 +1,7 @@
+/* This work is licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License.
+ * To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/
+
 // The proscenium alone was 85 foot high by 98 foot wide.
 
 // Based on {stage_layout,layout_sightlines}.jpg):
