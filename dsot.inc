@@ -1,3 +1,5 @@
+
+#version 3.7;
 #ifndef(DSOT_INC)
   #declare DSOT_INC = 1;
 
@@ -109,7 +111,7 @@
   #declare whiteplastic_t =  texture {pigment {rgb 1} finish {Glossy}};
   #declare bluerodtexture = texture {pigment {rgb <0.2, 0.2, 1>} finish {Dull}}  ;
   #declare grille_t = texture {pigment {Gray20} finish {specular 0.9 metallic}}; // ambient 0.04 
-  #declare handrail_t = texture {pigment {Yellow} finish {ambient 1}};
+  #declare handrail_t = texture {pigment {Yellow} finish {emission 1}};
   
   //----------------------------------------------------------------------
   #macro sign(a) 
@@ -187,6 +189,8 @@
       }
     #end
     
+    // Wireframe rectangular prism, lots of ambience to be visible in the dark.
+    // Sticks out like a "TODO" should.
     #macro glowbox(dimens, pigm)
       union {
 	cylinder {<0,0,0>*dimens, <1,0,0>*dimens, 0.03}	// Across stage
@@ -216,6 +220,7 @@
   // nearh is height of the box at the near, Z=0, end.
   // farh is the height at the Z=zed end.
   // rad is the radius passed to Round_Box
+  // Used in stomp boxes.
   #macro sloped_box(wid, nearh, farh, zed, rad)
     union {
       #if (nearh <= 0 | farh <= 0 | nearh >= farh)
@@ -489,7 +494,8 @@
   #end
 
   //######################################################################
-  // opacity is how much you can see through this set of louvres.
+  // opacity is how much you can see through this set of louvres
+  // (how of the separation between louvres is filled by their angle).
   // Louvres 8mm thick (look for 0.004).  Default depth (along +z) 4cm.
   // Louvres slope up along +z; rotate 180*x if you want them down.
 
@@ -624,7 +630,7 @@
       #if(! NO_AREA_LIGHTS) area_light 0.06*y, 2*_bendylight_r*x, 30, 3 adaptive 4 #end
       spotlight radius 20 falloff 45
       point_at -z
-      fade_distance 0.04 fade_power 2
+      fade_distance 0.08 fade_power 3.5
       // top length and bend
       translate <0, length2-0.02, radiu2>
       rotate -angl2*x
@@ -659,7 +665,7 @@
 	    bulb
 	    texture {
 	      pigment { colr }
-	      finish {ambient 0.7 diffuse 0.3}
+	      finish {emission 0.7 diffuse 0.3}
 	    }
 	    translate <0, length2-0.005, -0.002>
 	  }
@@ -717,8 +723,57 @@
   #end
     
   //######################################################################
+  // Like a softbox, but flat sides (not a superquadric) and a larger
+  // radius on the corners.  Think of a Mac Mini, or a square beer coaster.
+  // Called synthbox for the Kurzweil.
+  #macro synthbox (siz, radbig, radsmall)
+    #local Xx=siz.x-radsmall;
+    #local XX=siz.x-radbig;
+    #local Yy=siz.y-radsmall;
+    #local ZZ=siz.z-radbig;
+    #local Zz=siz.z-radsmall;
+    union {
+      // verticals
+      Round_Cylinder_Union(<radbig, 0, radbig>, <radbig, siz.y, radbig>, radbig, radsmall) // FL
+      Round_Cylinder_Union(<radbig, 0, ZZ>,     <radbig, siz.y, ZZ>, radbig, radsmall) // RL
+      Round_Cylinder_Union(<XX, 0, radbig>, <XX, siz.y, radbig>, radbig, radsmall) // FR
+      Round_Cylinder_Union(<XX, 0, ZZ>,     <XX, siz.y, ZZ>, radbig, radsmall) // RR
+      
+      // bottom edges
+      cylinder{<radsmall, radsmall, radbig>, <radsmall, radsmall, ZZ>, radsmall}
+      cylinder{<Xx, radsmall, radbig>, <Xx, radsmall, ZZ>, radsmall}
+      cylinder{<radbig, radsmall, radsmall>, <XX, radsmall, radsmall>, radsmall}
+      cylinder{<radbig, radsmall, ZZ>, <XX, radsmall, ZZ>, radsmall}
+	
+      // top edges
+      cylinder{<radsmall, Yy, radbig>, <radsmall, Yy, ZZ>, radsmall}
+      cylinder{<Xx, Yy, radbig>, <Xx, Yy, ZZ>, radsmall}
+      cylinder{<radbig, Yy, radsmall>, <XX, Yy, radsmall>, radsmall}
+      cylinder{<radbig, Yy, ZZ>, <XX, Yy, ZZ>, radsmall}
+      
+      // Now it looks like a boxing ring, only two ropes.
+      box{<0, radsmall, radbig>, <siz.x, Yy, ZZ>}
+      box{<radbig, radsmall, 0>, <XX, Yy, siz.z>}
+      
+      // Now it looks like someone put sides on and nearly filled it with water
+      box{<radsmall, 0, radbig>, <Xx, siz.y, ZZ>}
+      box{<radbig, 0, radsmall>, <XX, siz.y, Zz>}
+      
+    }
+  #end
+  
+  //######################################################################
 
-
+  #declare TEST_SYNTHBOX=1;
+  #if (TEST_SYNTHBOX)
+    camera { location <-0.5, 1, -2> look_at <0.5, 0.5, 0> }
+    object {synthbox (<2, 0.6, 2>, 0.2, 0.02)
+      pigment {rgb 0.5}
+    }
+    plane {  y, 0 texture { pigment { checker colour Green colour Yellow} }}
+    light_source {<-0.3, 3, -3>, White spotlight point_at y}
+  #end
+  
   #ifdef (TEST_SOFTLY)
     camera { location <0.5, 0.5, -2> look_at <0.5, 0.5, 0> }
     cylinder {0, x, 0.003 finish { ambient 1 } pigment {rgb z}}
@@ -739,7 +794,7 @@
       #local i = i + 0.02;
     #end
   #end
-//#declare TEST_BENDYLIGHT = 1;
+//  #declare TEST_BENDYLIGHT = 1;
   #ifdef (TEST_BENDYLIGHT)
 //    camera {location <-0.4, 0.3, -0.3> look_at <0, 0.2, 0> angle 30}
     //  camera {location <-0.2, 0.3, -0.2> look_at <0.1, 0.2, 0.1> angle 20}
@@ -749,6 +804,7 @@
     object {bendylight(0.05, 40, 0.10, 0.03, 70, 0.1, rgb 1) translate <0.1, 0.19, 0.15>}
     object {widgetbox(<0.2, 0.2, 0.2>)}
   #end
+//  #declare TEST_MICROPHONE = 1;
   #ifdef (TEST_MICROPHONE)
     camera {location <0, 1.4, -1.7> look_at <0, 0, 0> angle 20}
 //    camera {location <-0.2, 0.3, -0.2> look_at <0.1, 0.2, 0.1> angle 20}
@@ -756,6 +812,7 @@
     plane {  y, 0 texture { pigment { checker colour Green colour Yellow} }}
     object{mic_stand(45, 1.6) rotate 45*y}
   #end
+//  #declare TEST_SLOPEDBOX = 1;
   #ifdef (TEST_SLOPEDBOX)
     camera {location <-1, 1, -1> look_at <0, 0, 0> angle 50}
     light_source {<-1, 2, -3>, White spotlight point_at y radius 10}
