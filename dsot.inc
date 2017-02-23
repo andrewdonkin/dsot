@@ -9,6 +9,8 @@
   #include "math.inc"
   #include "shapes.inc"
 
+  #declare Eps=1/100000;
+  
   // So I can "#if (!NO_AREA_LIGHTS)"
   #ifndef (NO_AREA_LIGHTS)
     #declare NO_AREA_LIGHTS=0;
@@ -177,7 +179,7 @@
 	#else
 	  pigment {rgb y}		// Default green
 	#end
-	finish {ambient 0.8 diffuse 0.2}
+	finish {emission 0.8 diffuse 0.2}
       }
     #end
 
@@ -726,6 +728,7 @@
   // Like a softbox, but flat sides (not a superquadric) and a larger
   // radius on the corners.  Think of a Mac Mini, or a square beer coaster.
   // Called synthbox for the Kurzweil.
+  // Bounded by box origin to siz
   #macro synthbox (siz, radbig, radsmall)
     #local Xx=siz.x-radsmall;
     #local XX=siz.x-radbig;
@@ -764,8 +767,8 @@
   
   //######################################################################
 
-  #declare TEST_SYNTHBOX=1;
-  #if (TEST_SYNTHBOX)
+//  #declare TEST_SYNTHBOX=1;
+  #ifdef (TEST_SYNTHBOX)
     camera { location <-0.5, 1, -2> look_at <0.5, 0.5, 0> }
     object {synthbox (<2, 0.6, 2>, 0.2, 0.02)
       pigment {rgb 0.5}
@@ -824,6 +827,7 @@
   #end
 #end
 
+#if (0)
  sky_sphere {
 //      pigment {
 //          function { max(min(y,1),0) }
@@ -840,4 +844,5 @@
           }
       }  
   }
+#end
 #warning "dsot.inc out"

@@ -1,3 +1,8 @@
+/* This work is licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License.
+ * To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/
+ */
+
 // Keyboards are about 300-350 deep.
 // Stack three high, each offset by about 150, makes about 700 deep.
 
@@ -9,15 +14,13 @@
 
 // ffwd to 2014 and uberpov.
 
+// ffwd to 2017 and the Kurzweil K2000.  104cm x 34.1cm x 10.5cm
+
 #version 3.7;
 
 // #include "woods.inc"
-#declare TEST=1;
-#ifdef (TEST)
-  #undef TEST
-  #include "dsot.inc"
-  #declare TEST=1;
-#end
+#include "dsot.inc"                                         // synthbox
+#include "shapes.inc"
 
 #declare keyseed = seed(0);
 
@@ -26,7 +29,7 @@
   object {glowbox(<1.5, 1.0, 0.7>, Blue) translate 0.7*x}
   object {louvre(<1.5, 1.0, 0.02>, 20, 0.9) translate 0.7*x}
   object {glowbox(<-sqrt(0.7*0.7*2), 1.0, 0.7>, Blue) rotate 45*y translate 0.7*x}
-  object{louvre(<sqrt(0.7*0.7*2), 1.0, -0.02>, 20, 0.9) rotate 45*y translate 0.7*z}
+  object {louvre(<sqrt(0.7*0.7*2), 1.0, -0.02>, 20, 0.9) rotate 45*y translate 0.7*z}
   object {glowbox(<0.7, 1.0, 1.6>, Blue) translate 0.7*z}
   object {louvre(<-1.6, 1.0, 0.02>, 20, 0.9) rotate 90*y translate 0.7*z}
 
@@ -51,9 +54,10 @@
   }
 #end
 
-#local _7octwidth = 1.154;			// seven octaves in metres
+#local _7octwidth = 1.154;			// seven octaves in metres, off a Casio.
 #local _keyboardwidth = _7octwidth * 52 / 49;	// width of an 88-key keyboard
-#local _whitewidth = (_7octwidth / 7 / 7) - 0.001;
+#local _keywidth = _7octwidth / 49;             // width of one key and its gap
+#local _whitewidth = (_7octwidth / 7 / 7) - 0.001; // 1mm gap
 #local _blackwidth = 0.011;				    // width of a black key at base
 #local _blackradius = 0.0005;
 #local _whiteradius = 0.0003;
@@ -62,6 +66,8 @@
 #local _p_whitekey = colour rgbt <1, 1, 1, 0.005> ; // alpha required for uberpov bug
 #local _p_blackkey = colour rgbt <0.02, 0.02, 0.02, 0.005> ; // alpha required for uberpov bug
 
+// White key texture.
+// Faux-ivory of a digital piano.
 #local _t_whitekey = texture {
   gradient x  
   turbulence <0.7, 0, 0>
@@ -81,23 +87,23 @@
   translate <1, 0.01, 0>
 };
 
+// Black key texture.
+// This faux-ebony texture of a digital piano is too fancy for a synth.
+// Synths are plastic and shinier.
 #local _t_blackkey = texture {
-  wood  
-  turbulence <0.06, 0, 0>
+  gradient x
+  turbulence <0.6, 0, 0>
   texture_map {
-    [0   pigment{rgb  _p_blackkey} finish {specular 1    roughness 0.0001}]
-    [0.1 pigment{rgb  _p_blackkey} finish {specular 1    roughness 0.0001}]
-    [0.1 pigment{rgb  _p_blackkey} finish {specular 0.5  roughness 0.001}]
-    [0.5 pigment{rgb  _p_blackkey} finish {specular 0.5  roughness 0.001}]
-    [0.6 pigment{rgb  _p_blackkey} finish {specular 0.5 roughness 0.001}]
-    [0.7 pigment{rgb  _p_blackkey} finish {specular 0.5 roughness 0.001}]
-    [1   pigment{rgb _p_blackkey / 2 } finish {specular 0}]
+    [0   pigment{colour _p_blackkey} finish {specular 1   roughness 0.0001}]
+    [0.1 pigment{colour _p_blackkey} finish {specular 1   roughness 0.0001}]
+    [0.1 pigment{colour _p_blackkey} finish {specular 0.5 roughness 0.001}]
+    [0.5 pigment{colour _p_blackkey} finish {specular 0.5 roughness 0.001}]
+    [0.6 pigment{colour _p_blackkey} finish {specular 0.5 roughness 0.001}]
+    [0.7 pigment{colour _p_blackkey} finish {specular 0.5 roughness 0.001}]
+    [1   pigment{colour _p_blackkey / 2 } finish {specular 0}]
   }
-  octaves 1
-  //omega 0
-  scale <0.003, 0.001, 0.04>
-  //rotate <0, 1, 0>
-  translate 4 * x
+  scale <0.003, 0.01, 0.04>
+  rotate <0, 0, 10>
 };
 
 // rotate by a tiny amount in all three axes to stop all the keys being perfectly placed.
@@ -107,6 +113,9 @@
   translate 0.2*z
 #end
 
+//---------------------------------------------------
+// Black key, straight-sided, inclined back and inward, flat top.
+// Piano-style.  Synths are more curved.
 #local _blackhalftop =
 intersection {
     union {
@@ -174,7 +183,7 @@ intersection {
     object {_blackhalftop
       scale <-1, 1, 1>					    // right
     }
-    // now, the unsheared part underneath
+    // now, the unsheared part underneath, visible when a white key is down
     union {
       cylinder {						    // front bottom
 	<-1, 0, 0>,
@@ -227,7 +236,7 @@ intersection {
     <0.0002 + _whiteradius, -0.001, 0.002 + _whiteradius>, _whiteradius}
   cylinder {<_whitewidth - 0.0002 - _whiteradius, -0.041, 0.002+ _whiteradius>,
     <_whitewidth - 0.0002 - _whiteradius, -0.001, 0.002+ _whiteradius>, _whiteradius}
-  bounded_by {box {<0, -0.041, 0>, <_whitewidth, 0, 0.16> }}
+//  bounded_by {box {<0, -0.041, 0>, <_whitewidth, 0, 0.16> }}
 }
 
 
@@ -271,17 +280,18 @@ intersection {
   texture { _t_whitekey }
 }
 
+// An A with no G# subtracted from it.
 #local _keylowa = difference {
   object { _whitekey _keywiggle() translate x * 5 * (_whitewidth + 0.001)}
   box {<0.137, 0.01, 0.051>, <0.151, -0.05, 0.170>}
   texture { _t_whitekey }
 }
+// A C with no C# subtracted from it.
 #local _keyhighc = object {
   _whitekey
   _keywiggle()
   texture { _t_whitekey }
 }
-
 
 #macro _octave(which_octave)
   union {
@@ -301,27 +311,7 @@ intersection {
   }
 #end
 
-#ifdef (TEST)
-  global_settings {
-  // ambient_light 1
-  //   ambient_light 0 radiosity {  }
-  // max_trace_level 200
-  assumed_gamma 1
-  }
-
-//  sky_sphere { test_sky_sphere }
-
-  
-  camera { location <0.05, 0.05, -0.1> look_at <0.03, 0.015, 0> angle 30 } // two blacks
-//  camera { location <0.05, 0.02, -0.1> look_at <0.03, -0.01, 0> angle 30 } // white fronts
-//   camera { location <-0.5, 0.4, 0.3> look_at <0.1 0., 0.1> angle 15 } // black texture
-//   camera { location <0.06, 0.07, -0.2> look_at <_whitewidth * 3, 0.01, 0> }  // one octave
-//  camera { location <0.00, 0.17, -0.2> look_at <0.1, 0.01, 0> } // left end
-  //camera { location <_7octwidth*6/7, 0.17, -0.2> look_at <_7octwidth, 0.01, 0> } // right end
-  //camera { location <_7octwidth*3/7, 0.17, -0.2> look_at <_7octwidth*4/7, 0.01, 0> } // wide
-  plane {  y, -0.1 texture { pigment { checker colour Green colour Yellow} }}
-  light_source { <1.7, 0.9, -.4> White }
-
+#declare keyboard88 = object {
   union {
     _octave(0)
     _octave(1)
@@ -338,23 +328,102 @@ intersection {
       object {_blackkey translate <0.138, 0, 0.052> texture {_t_blackkey translate z*rand(keyseed)}}
       translate x * _7octwidth / 7 * -1
     }
-    // highest C
+    // highest C, tacked on the end
     object {_keyhighc
-      translate x * _7octwidth / 7 * 7
+      translate x * _7octwidth
     }
+    // Shift it right to move the left side of the low A to x=0
+    // 52 white keys on an 88-key kbd
     translate x * _keyboardwidth / 52 * 2
   }
-  
-  box { <0, 0.002, 0.148>, < _keyboardwidth, 0.015, 0.170> 
-    texture {
-      pigment { rgb 0}
+}
+
+// For the Kurzweil
+#declare keyboard61width = _keyboardwidth / 52 * 36;  // call it 84.5cm
+#declare keyboard61 = object {
+  union {
+    _octave(0)
+    _octave(1)
+    _octave(2)
+    _octave(3)
+    _octave(4)
+
+    // highest C, tacked on the end
+    object {_keyhighc
+      translate x * _7octwidth / 7 * 5
     }
   }
-  box { <0, 0.0005, 0.148>, < _keyboardwidth, 0.002, 0.150> 
-    texture {
-      pigment { rgb x/2}
-    }
+}
+
+#if (0)
+  global_settings {
+    // ambient_light 1
+     ambient_light 0 radiosity {  }
+    // max_trace_level 200
+    assumed_gamma 1
   }
+
+  //  sky_sphere { test_sky_sphere }
   
+  //camera { location <0.05, 0.05, -0.1> look_at <0.03, 0.015, 0> angle 30 } // two blacks
+  //  camera { location <0.05, 0.02, -0.1> look_at <0.03, -0.01, 0> angle 30 } // white fronts
+  //   camera { location <-0.5, 0.4, 0.3> look_at <0.1 0., 0.1> angle 15 } // black texture
+  //   camera { location <0.06, 0.07, -0.2> look_at <_whitewidth * 3, 0.01, 0> }  // one octave
+  //  camera { location <0.00, 0.17, -0.2> look_at <0.1, 0.01, 0> } // left end
+  //camera { location <_7octwidth*6/7, 0.17, -0.2> look_at <_7octwidth, 0.01, 0> } // right end
+  //camera { location <_7octwidth*3/7, 0.17, -0.2> look_at <_7octwidth*4/7, 0.01, 0> } // wide
+  camera { location <_7octwidth*-1/7, 0.22, -0.5> look_at <_7octwidth*1.5/7, 0.01, -0.1> } // wider
+
+  plane {  y, -0.1 texture { pigment { checker colour Green colour Yellow} }}
+  light_source { <1.7, 0.9, -.4> White }
+
+  object {keyboard88}
+  box { <0, 0.002, 0.148>, < _keyboardwidth, 0.015, 0.170> pigment { rgb 0} }
+  box { <0, 0.0005, 0.148>, < _keyboardwidth, 0.002, 0.150> pigment { rgb x/2} }
+
+  union {
+    object {keyboard61}
+    box { <0, 0.002, 0.148>, < keyboard61width, 0.015, 0.170> pigment { rgb 0} }
+    box { <0, 0.0005, 0.148>, < keyboard61width, 0.002, 0.150> pigment { rgb x/2} }
+    translate z * -0.2
+  }
+
 #end
+
+#if (1)
+  global_settings {
+    // ambient_light 1
+    // ambient_light 0 radiosity {  }
+    // max_trace_level 200
+    assumed_gamma 1
+  }
+
+  camera { location <-0.1, 0.30, -0.5> look_at <0.3, 0.01, 0.1> }
+//  camera { location <1.06, 0.30, -0.5> look_at <1, 0.01, 0.1> } // right corner
+//  camera { location <1.06, 0.30, 0> look_at <1, 0.01, 0.3> } // right internal corner
+  camera { location <1.06, 0.30, -0.3> look_at <1, 0.01, 0> } // right corner
+//  camera { location <0.1, 0.30, 0> look_at <0.3, 0.01, 0.3> } // left rear internal corner
+
+  plane {  y, -0.1 texture { pigment { checker colour Green colour Yellow} }}
+  light_source { <1.7, 0.9, -.4> White }
+  light_source { <-1.7, 0.9, -.4> Red }
+
+  // wish I was doing this in cm
+  union {
+    union {
+      difference {
+        object { synthbox(<1.04, 0.05, 0.34>, 0.01, 0.002) }
+        box {<0.14, -Eps, -Eps> < 1.01, 0.05+Eps, 0.31 >}
+      }
+      object { Round_Box_Union(<0.13, 0, 0>, <0.16, 0.05, 0.33>, 0.002) }
+      // This 1.007 is 0.16 plus keyboard61width, plus a gap
+      object { Round_Box_Union(<1.007, 0, 0>, <1.02, 0.05, 0.33>, 0.002) }
+      object { Round_Box_Union(<0.15, 0, 0.30>, <1.01, 0.05, 0.33>, 0.002) }
+      texture {_t_whitekey}
+    }
+    object {keyboard61 translate <0.16, 0.05, -0.0>}
+  }
+
+#end
+
 #warning "keys.inc out"
