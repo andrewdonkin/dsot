@@ -114,8 +114,10 @@
   translate 0.2*z
 #end
 
-//---------------------------------------------------
-// Black key, straight-sided, inclined back and inward, flat top.
+//######################################################################
+// The Black Keys
+
+// Straight-sided, inclined back and inward, flat top.
 // Piano-style.  Synths are more curved.
 #local _blackhalftop =
 intersection {
@@ -175,7 +177,6 @@ intersection {
   plane { z, _blackdepth} // and the front.  Very sharp cut-off.
 }
 
-//######################################################################
 // black key with front left point at x=0, z=0.
 // Top of white keys should be at y=0
 #local _blackkey =
@@ -225,12 +226,12 @@ intersection {
 #local _k2kblackkey = union {
   difference {
     object {
-      superellipsoid { <0.2, 0.3> translate <1, 0, 1> // left- and front-aligned to origin.  y in [-1,1]
+      superellipsoid { <0.3, 0.3> translate <1, 0, 1> // left- and front-aligned to origin.  y in [-1,1]
         scale <_blackwidth/2, _blackheight * 1, _blackdepth>}
       // shear, lean it away
       matrix <
       1, 0, 0,
-      0, 1, 0.8,
+      0, 1, 0.7,
       0, 0, 1,
       0, 0, 0 >
       
@@ -241,9 +242,21 @@ intersection {
   }
   // now, the unsheared part underneath, visible when a white key is down
   box { <0, 0, 0.05>, < _blackwidth, -0.01, 0.10 > }
+  texture {
+    pigment {rgb <0,0,0>}
+    finish {
+      conserve_energy
+      specular 0.5
+      roughness 0.01
+      reflection {0.01 0.1 fresnel on}
+    }
+  }
+  interior { ior 3 }
 }
 
 //######################################################################
+// The White Stripes
+
 // Square, traditional, piano key shape
 #local _whitekey = union {
   object {
@@ -263,16 +276,26 @@ intersection {
   cylinder {<_whitewidth - 0.0002 - _whiteradius, -0.041, 0.002+ _whiteradius>,
     <_whitewidth - 0.0002 - _whiteradius, -0.001, 0.002+ _whiteradius>, _whiteradius}
 //  bounded_by {box {<0, -0.041, 0>, <_whitewidth, 0, 0.16> }}
-  blurred_tm(pigment{rgb 1}, finish{
-    conserve_energy
-    specular 0.1
-    roughness 0.05
-    reflection {0.1 0.5 fresnel on metallic 0}
-  }, 10)
-  interior{ior 1.6}
+  texture {
+    pigment{rgb 1}
+    normal {
+      marble 0.05
+      warp { turbulence 0.3 }
+      sine_wave
+      scale 1/2000 // wavelength of each ripple
+    }
+    finish {
+      conserve_energy
+      specular 0.1
+      roughness 0.05
+      reflection {0.01 0.2 fresnel on metallic 0}
+    }
+  }
+  interior{ior 3} // needed for fresnel reflections
 }
 
-// For a synth
+//----------------------------------------------------------------------
+// White synth key
 #local _k2kwhiteradius = 0.001;
 #local _k2kwhitekey = union {
   object {
@@ -285,13 +308,15 @@ intersection {
     <0.0002 + _k2kwhiteradius, -0.001, 0.002 + _k2kwhiteradius>, _k2kwhiteradius}
   cylinder {<_whitewidth - 0.0002 - _k2kwhiteradius, -0.01, 0.002+ _k2kwhiteradius>,
     <_whitewidth - 0.0002 - _k2kwhiteradius, -0.001, 0.002+ _k2kwhiteradius>, _k2kwhiteradius}
-  blurred_tm(pigment{rgb 1}, finish{
-      conserve_energy
-      specular 0.1
-      roughness 0.05
-      reflection {0.1 0.5 fresnel on metallic 0}
-    }, 10)
+  pigment{rgb 1}
+  finish{
+    conserve_energy
+    specular 0.1
+    roughness 0.05
+    reflection {0.1 0.5 fresnel on metallic 0}
+  }
   interior{ior 1.6}
+  // Pretty fly for a white key
 }
 
 //######################################################################
@@ -425,14 +450,14 @@ intersection {
 
 //######################################################################
 // Synth keys
-#local _k2kkeyc = _keybuilderc(_k2kwhitekey, object {_k2kblackkey texture {_t_blackkey translate z*rand(keyseed)}})
-#local _k2kkeyd = _keybuilderd(_k2kwhitekey, object {_k2kblackkey texture {_t_blackkey translate z*rand(keyseed)}})
+#local _k2kkeyc = _keybuilderc(_k2kwhitekey, object {_k2kblackkey })
+#local _k2kkeyd = _keybuilderd(_k2kwhitekey, object {_k2kblackkey })
 #local _k2kkeye = _keybuildere(_k2kwhitekey)
-#local _k2kkeyf = _keybuilderf(_k2kwhitekey, object {_k2kblackkey texture {_t_blackkey translate z*rand(keyseed)}})
-#local _k2kkeyg = _keybuilderg(_k2kwhitekey, object {_k2kblackkey texture {_t_blackkey translate z*rand(keyseed)}})
-#local _k2kkeya = _keybuildera(_k2kwhitekey, object {_k2kblackkey texture {_t_blackkey translate z*rand(keyseed)}})
+#local _k2kkeyf = _keybuilderf(_k2kwhitekey, object {_k2kblackkey })
+#local _k2kkeyg = _keybuilderg(_k2kwhitekey, object {_k2kblackkey })
+#local _k2kkeya = _keybuildera(_k2kwhitekey, object {_k2kblackkey })
 #local _k2kkeyb = _keybuilderb(_k2kwhitekey)
-#local _k2kkeylowa = _keybuilderlowa(_k2kwhitekey, object {_k2kblackkey texture {_t_blackkey translate z*rand(keyseed)}})
+#local _k2kkeylowa = _keybuilderlowa(_k2kwhitekey, object {_k2kblackkey })
 #local _k2kkeyhighc = _keybuilderhighc(_k2kwhitekey)
 
 #macro _k2koctave(which_octave)
@@ -466,8 +491,8 @@ intersection {
 
 #if (1)
   global_settings {
-    // ambient_light 1
-    //ambient_light 0 radiosity {  }
+    // ambient_light 0
+    // ambient_light 0 radiosity {  }
     // max_trace_level 200
     assumed_gamma 1
   }
@@ -484,9 +509,9 @@ intersection {
   //camera { location <_7octwidth*3/7, 0.17, -0.2> look_at <_7octwidth*4/7, 0.01, 0> } // wide
   //camera { location <_7octwidth*-1/7, 0.22, -0.55> look_at <_7octwidth*1.2/7, 0, -0.15> angle 10} // synth black shape
   //camera { location <0, 0.22, -0.15> look_at <_7octwidth*3/7, 0, -0.15> angle 30} // gaps behind synth blacks
-  camera { location <_7octwidth*-1/7, 0.22, -0.5> look_at <_7octwidth*1.5/7, 0.01, -0.1> angle 15} // wider
+  camera { location <_7octwidth*-1/7, 0.22, -0.5> look_at <_7octwidth*1.5/7, 0.01, -0.1> angle 35} // wider
 
-  plane {  y, -0.1 texture { pigment { checker colour Green colour Yellow} }}
+  plane {  y, -0.1 texture { pigment { checker colour rgb<0.8,0,0.8> colour rgb<1,1,1> scale 0.1} }}
   light_source { <-1.7, 0.9, -.4> White }
 
   object {keyboard88}
