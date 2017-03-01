@@ -299,13 +299,14 @@
 //======================================================================
   // A texture with averaged normals.  Bring the pigment and finish, and
   // I'll supply the normal.  Finish should be "reflection X".
-  #macro blurred_tm(pigm, fin)
+  #macro blurred_tm(pigm, fin, optional _n)
     #if(0 & NO_AREA_LIGHTS)
       texture {pigment {pigm} finish {fin}}
     #else
+      #ifndef(_n) #local _n=20; #end
       texture {
 	average texture_map {
-	  #local i=20; #while (i)
+	  #local i=_n; #while (i)
 	    [ 1 pigment { pigm }
 	      normal {bozo 1 translate <rand(bseed),rand(bseed),rand(bseed)> scale 0.0001}
 	      finish { fin }
@@ -470,7 +471,7 @@
       contained_by { box {<-0.19, 0, -0.19>, <0.19, 0.06, 0.19>}}
       max_gradient 2.1
       //    texture {pigment {rgb 0.2 } finish {phong 0.2 specular 0.2 roughness 0.01 reflection 0.2}}
-      blurred_tm(pigment {rgb 0.2 }, finish {phong 0.2 specular 0.2 roughness 0.01 reflection 0.1})
+      blurred_tm(pigment {rgb 0.2 }, finish {phong 0.2 specular 0.2 roughness 0.01 reflection 0.1}, 20)
     }
     ycyl(0.013, 0.9)		// Lower part of stand, 2.6cm diameter.
     isosurface {			// Tightener
