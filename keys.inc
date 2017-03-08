@@ -54,15 +54,15 @@
   }
 #end
 
-#local _7octwidth = 1.154;			// seven octaves in metres, off a Casio.
+#local _7octwidth = 115.4;			// seven octaves in metres, off a Casio.
 #local _keyboardwidth = _7octwidth * 52 / 49;	// width of an 88-key keyboard
 #local _keywidth = _7octwidth / 49;             // width of one key and its gap
-#local _whitewidth = (_7octwidth / 7 / 7) - 0.001; // 1mm gap
-#local _blackwidth = 0.011;				    // width of a black key at base
-#local _blackradius = 0.0005;
-#local _whiteradius = 0.0003;
-#local _blackheight = 0.009;
-#local _blackdepth = 0.092;
+#local _whitewidth = (_7octwidth / 7 / 7) - 000.1; // 1mm gap
+#local _blackwidth = 001.1;				    // width of a black key at base
+#local _blackradius = 000.05;
+#local _whiteradius = 000.03;
+#local _blackheight = 000.9;
+#local _blackdepth = 009.2;
 
 #local _p_whitekey = colour rgbt <1, 1, 1, 0.005> ; // alpha required for uberpov bug
 #local _p_blackkey = colour rgbt <0.02, 0.02, 0.02, 0.005> ; // alpha required for uberpov bug
@@ -83,9 +83,9 @@
   }
   octaves 4
   omega 0.25
-  scale <0.002, 0.001, 0.04>
+  scale <000.2, 000.1, 004>
   // rotate <0, 1, 0>
-  translate <1, 0.01, 0>
+  translate <100, 001., 0>
 };
 
 // Black key texture.
@@ -103,15 +103,15 @@
     [0.7 pigment{colour _p_blackkey} finish {specular 0.5 roughness 0.001}]
     [1   pigment{colour _p_blackkey * 0.8 } finish {specular 0}]
   }
-  scale <0.003, 0.01, 0.04>
+  scale <000.3, 001., 004.>
   rotate <0, 0, 10>
 };
 
 // rotate by a tiny amount in all three axes to stop all the keys being perfectly placed.
 #macro _keywiggle()
-  translate -0.2*z
-  rotate <(rand(keyseed) - 0.5) * 0.2, (rand(keyseed)-0.5) * 0.1, (rand(keyseed)-0.5) * 0.1 >
-  translate 0.2*z
+  translate -020*z
+  rotate <(rand(keyseed) - 0.5) * 0.2, (rand(keyseed)-0.5) * 0.01, (rand(keyseed)-0.5) * 0.01 >
+  translate 020*z
 #end
 
 //######################################################################
@@ -149,21 +149,21 @@ intersection {
     sphere { <- (_blackwidth/2 - _blackradius), 0, _blackradius>, 0 }
     sphere { <+ (_blackwidth/2 - _blackradius), 0, _blackradius>, 0 }
     cylinder {						    // right top
-      0, z/3, _blackradius
+      0, 100*z/3, _blackradius
       translate <+ (_blackwidth/2 - _blackradius), _blackheight - _blackradius, _blackradius>
     }
     cylinder {						    // left top
-      0, z/3, _blackradius
+      0, 100*z/3, _blackradius
       translate <- (_blackwidth/2 - _blackradius), _blackheight - _blackradius, _blackradius>
     }
-   box { 0, < _blackwidth - 2*_blackradius, _blackheight - _blackradius, 1/3> // front
+   box { 0, < _blackwidth - 2*_blackradius, _blackheight - _blackradius, 100/3> // front
      translate x * -(_blackwidth / 2 - _blackradius)
     }
-    box { _blackradius * z, <_blackwidth, _blackheight - _blackradius, 1/3>  // sides
+    box { _blackradius * z, <_blackwidth, _blackheight - _blackradius, 100/3>  // sides
       translate <- _blackwidth/2, 0, 0>
     }
 
-   box { _blackradius * z, < _blackwidth - 2 * _blackradius, _blackheight, 1/3> // top
+   box { _blackradius * z, < _blackwidth - 2 * _blackradius, _blackheight, 100/3> // top
      translate <- _blackwidth/2 + _blackradius, 0, 0>
    }
     // shear.  first term leans it to the right, second leans it away
@@ -206,17 +206,17 @@ intersection {
 	_blackradius
 	translate <+ (_blackwidth/2 - _blackradius), 0, _blackradius>
       }
-      box { 0, < _blackwidth - 2 * _blackradius, -0.01, 0.01 > // front
+      box { 0, < _blackwidth - 2 * _blackradius, -001., 001. > // front
 	translate < - _blackwidth/2 + _blackradius, 0, 0>
       }
-      box { 0, < _blackwidth, -0.01, 0.10 > // sides
+      box { 0, < _blackwidth, -001., 010. > // sides
 	translate < - _blackwidth / 2, 0, _blackradius>
       }
     }
     // No texture.  Add it later, outside the object defn, so it can vary between keys
     // lift it a little to show the transition point between upper and lower parts better.
     // keywiggling hides it a bit.
-    translate <_blackwidth / 2, 0.001, 0>
+    translate <_blackwidth / 2, 000.1, 0>
     _keywiggle()
   }
 
@@ -241,7 +241,7 @@ intersection {
     plane {-z, -_blackdepth}
   }
   // now, the unsheared part underneath, visible when a white key is down
-  box { <0, 0, 0.05>, < _blackwidth, -0.01, 0.10 > }
+  box { <0, 0, 005.>, < _blackwidth, -001., 010. > }
   texture {
     pigment {rgb <0,0,0>}
     finish {
@@ -257,33 +257,8 @@ intersection {
 //######################################################################
 // The White Stripes
 
-// Square, traditional, piano key shape
-#local _whitekey = union {
-  object {
-  #ifdef (CHEAP_MUSIC) 
-    box {-1, 1}
-#else
-    superellipsoid { <0.25, 0.05>}
-  #end
-    translate 1                     // put bottom front left on origin, 2x2x2 cube(ish)
-    scale < _whitewidth / 2, 0.001, 0.08>
-    translate y * -0.002
-  }
-  box {<0.0002 + _whiteradius, -0.041, 0.002>, <_whitewidth-0.0002- _whiteradius, -0.001, 0.16>}  
-  box {<0.0002, -0.041, 0.002+ _whiteradius>, <_whitewidth-0.0002, -0.001, 0.16>}
-  cylinder {<0.0002 + _whiteradius, -0.041, 0.002+ _whiteradius>,
-    <0.0002 + _whiteradius, -0.001, 0.002 + _whiteradius>, _whiteradius}
-  cylinder {<_whitewidth - 0.0002 - _whiteradius, -0.041, 0.002+ _whiteradius>,
-    <_whitewidth - 0.0002 - _whiteradius, -0.001, 0.002+ _whiteradius>, _whiteradius}
-//  bounded_by {box {<0, -0.041, 0>, <_whitewidth, 0, 0.16> }}
-  texture {
+#local _t_whitekey = texture {
     pigment{rgb 1}
-    normal {
-      marble 0.05
-      warp { turbulence 0.3 }
-      sine_wave
-      scale 1/2000 // wavelength of each ripple
-    }
     finish {
       conserve_energy
       specular 0.1
@@ -291,6 +266,31 @@ intersection {
       reflection {0.01 0.2 fresnel on metallic 0}
     }
   }
+
+// Square, traditional, piano key shape
+#local _whitekey = union {
+  object {
+    superellipsoid { <0.25, 0.05> }
+      texture { _t_whitekey
+    normal {
+      marble 0.05
+      warp { turbulence 0.3 }
+      sine_wave
+      scale 1/2000 // wavelength of each ripple
+    }
+  }
+    translate 1                     // put bottom front left on origin, 2x2x2 cube(ish)
+    scale < _whitewidth / 2, 000.1, 008.>
+    translate y * -000.2
+  }
+  box {<000.02 + _whiteradius, -004.1, 000.2>, <_whitewidth-000.02- _whiteradius, -000.1, 016.>}  
+  box {<000.02, -004.1, 000.2+ _whiteradius>, <_whitewidth-000.02, -000.1, 016.>}
+  cylinder {<000.02 + _whiteradius, -004.1, 000.2+ _whiteradius>,
+    <000.02 + _whiteradius, -000.1, 000.2 + _whiteradius>, _whiteradius}
+  cylinder {<_whitewidth - 000.02 - _whiteradius, -004.1, 000.2+ _whiteradius>,
+    <_whitewidth - 000.02 - _whiteradius, -000.1, 000.2+ _whiteradius>, _whiteradius}
+//  bounded_by {box {<0, -004.1, 0>, <_whitewidth, 0, 016.> }}
+  texture { _t_whitekey } // minus the normal that the key top has - too much moire
   interior{ior 3} // needed for fresnel reflections
 }
 
@@ -299,22 +299,27 @@ intersection {
 #local _k2kwhiteradius = 0.001;
 #local _k2kwhitekey = union {
   object {
-    synthbox(<_whitewidth, 0.003, 0.16>, 0.003, 0.0008)
-    translate y * -0.003
+    synthbox(<_whitewidth, 000.3, 016.>, 000.3, 000.08)
+    translate y * -000.3
   }
-  box {<0.0002 + _k2kwhiteradius, -0.01, 0.002>, <_whitewidth-0.0002 - _k2kwhiteradius, -0.001, 0.16>}  
-  box {<0.0002, -0.01, 0.002+ _k2kwhiteradius>, <_whitewidth-0.0002, -0.001, 0.16>}
-  cylinder {<0.0002 + _k2kwhiteradius, -0.01, 0.002+ _k2kwhiteradius>,
-    <0.0002 + _k2kwhiteradius, -0.001, 0.002 + _k2kwhiteradius>, _k2kwhiteradius}
-  cylinder {<_whitewidth - 0.0002 - _k2kwhiteradius, -0.01, 0.002+ _k2kwhiteradius>,
-    <_whitewidth - 0.0002 - _k2kwhiteradius, -0.001, 0.002+ _k2kwhiteradius>, _k2kwhiteradius}
-  pigment{rgb 1}
-  finish{
-    conserve_energy
-    specular 0.1
-    roughness 0.05
-    reflection {0.1 0.5 fresnel on metallic 0}
-  }
+  box {<000.02 + _k2kwhiteradius, -001., 000.2>, <_whitewidth-000.02 - _k2kwhiteradius, -000.1, 016.>}  
+  box {<000.02, -001., 000.2+ _k2kwhiteradius>, <_whitewidth-000.02, -000.1, 016.>}
+  cylinder {<000.02 + _k2kwhiteradius, -001., 000.2+ _k2kwhiteradius>,
+    <000.02 + _k2kwhiteradius, -000.1, 000.2 + _k2kwhiteradius>, _k2kwhiteradius}
+  cylinder {<_whitewidth - 000.02 - _k2kwhiteradius, -001., 000.2+ _k2kwhiteradius>,
+    <_whitewidth - 000.02 - _k2kwhiteradius, -000.1, 000.2+ _k2kwhiteradius>, _k2kwhiteradius}
+  texture {
+    average texture_map {
+	  #local i=20; #while (i)
+	    [ 1 pigment { rgb 1 }
+	      normal {bozo 0.3 translate <rand(bseed),rand(bseed),rand(bseed)> scale 0.001}
+	      finish{ conserve_energy specular 0.1 roughness 0.05 reflection {0.1 0.5 fresnel on metallic 0}}
+	    ]
+	    #local i=i-1; #end
+	}
+	}
+	//pigment{rgb 1}
+  //finish{ conserve_energy specular 0.1 roughness 0.05 reflection {0.1 0.5 fresnel on metallic 0}}
   interior{ior 1.6}
   // Pretty fly for a white key
 }
@@ -327,67 +332,67 @@ intersection {
   union {
     difference  {
       object { _whitey _keywiggle() }
-      box {<0.014, 0.01, 0.051>, <0.027, -0.05, 0.170>}
+      box {<001.4, 001., 005.1>, <002.7, -005., 017.0>}
     }
-    object {_blacky translate <0.015, 0, 0.052> }
+    object {_blacky translate <001.5, 0, 005.2> }
   }
 #end
 #macro _keybuilderd(_whitey, _blacky)
   union {
     difference {
-      object { _whitey _keywiggle() translate x * (_whitewidth + 0.001)}
-      box {<0.014, 0.01, 0.051>, <0.027, -0.05, 0.170>}
-      box {<0.042, 0.01, 0.051>, <0.055, -0.05, 0.170>}
+      object { _whitey _keywiggle() translate x * (_whitewidth + 000.1)}
+      box {<001.4, 001., 005.1>, <002.7, -005., 017.0>}
+      box {<004.2, 001., 005.1>, <005.5, -005., 017.0>}
     }
-    object {_blacky translate <0.043, 0, 0.052> }
+    object {_blacky translate <004.3, 0, 005.2> }
   }
 #end
 #macro _keybuildere(_whitey)
   difference {
-    object { _whitey _keywiggle() translate x * 2 * (_whitewidth + 0.001)}
-    box {<0.042, 0.01, 0.051>, <0.055, -0.05, 0.170>}
+    object { _whitey _keywiggle() translate x * 2 * (_whitewidth + 000.1)}
+    box {<004.2, 001., 005.1>, <005.5, -005., 017.0>}
   }
 #end
 #macro _keybuilderf(_whitey, _blacky)
   union {
     difference {
-      object { _whitey _keywiggle() translate x * 3 * (_whitewidth + 0.001)}
-      box {<0.083, 0.01, 0.051>, <0.097, -0.05, 0.170>}
+      object { _whitey _keywiggle() translate x * 3 * (_whitewidth + 000.1)}
+      box {<008.3, 001., 005.1>, <009.7, -005., 017.0>}
     }
-    object {_blacky translate <0.084, 0, 0.052> }
+    object {_blacky translate <008.4, 0, 005.2> }
   }
 #end
 #macro _keybuilderg(_whitey, _blacky)
   union {
     difference {
-      object { _whitey _keywiggle()  translate x * 4 * (_whitewidth + 0.001)}
-      box {<0.083, 0.01, 0.051>, <0.097, -0.05, 0.170>}
-      box {<0.110, 0.01, 0.051>, <0.122, -0.05, 0.170>}
+      object { _whitey _keywiggle()  translate x * 4 * (_whitewidth + 000.1)}
+      box {<008.3, 001., 005.1>, <009.7, -005., 017.0>}
+      box {<011.0, 001., 005.1>, <012.2, -005., 017.0>}
     }
-    object {_blacky translate <0.111, 0, 0.052> }
+    object {_blacky translate <011.1, 0, 005.2> }
   }
 #end
 #macro _keybuildera(_whitey, _blacky)
   union {
     difference {
-      object { _whitey _keywiggle() translate x * 5 * (_whitewidth + 0.001)}
-      box {<0.110, 0.01, 0.051>, <0.122, -0.05, 0.170>}
-      box {<0.137, 0.01, 0.051>, <0.151, -0.05, 0.170>}
+      object { _whitey _keywiggle() translate x * 5 * (_whitewidth + 000.1)}
+      box {<011.0, 001., 005.1>, <012.2, -005., 017.0>}
+      box {<013.7, 001., 005.1>, <015.1, -005., 017.0>}
     }
-    object {_blacky translate <0.138, 0, 0.052>}
+    object {_blacky translate <013.8, 0, 005.2>}
   }
 #end
 #macro _keybuilderb(_whitey)
   difference {
-    object { _whitey _keywiggle() translate x * 6 * (_whitewidth + 0.001)}
-    box {<0.137, 0.01, 0.051>, <0.151, -0.05, 0.170>}
+    object { _whitey _keywiggle() translate x * 6 * (_whitewidth + 000.1)}
+    box {<013.7, 001., 005.1>, <015.1, -005., 017.0>}
   }
 #end
 // An A with no G# subtracted from it.
 #macro _keybuilderlowa(_whitey, _blacky)
   difference {
-    object { _whitey _keywiggle() translate x * 5 * (_whitewidth + 0.001)}
-    box {<0.137, 0.01, 0.051>, <0.151, -0.05, 0.170>}
+    object { _whitey _keywiggle() translate x * 5 * (_whitewidth + 000.1)}
+    box {<013.7, 001., 005.1>, <015.1, -005., 017.0>}
   }
 #end
 // A C with no C# subtracted from it.
@@ -435,7 +440,7 @@ intersection {
     union {
       object {_keylowa}
       object {_keyb}
-      object {_blackkey translate <0.138, 0, 0.052> texture {_t_blackkey translate z*rand(keyseed)}}
+      object {_blackkey translate <013.8, 0, 005.2> texture {_t_blackkey translate z*rand(keyseed)}}
       translate x * _7octwidth / 7 * -1
     }
     // highest C, tacked on the end
@@ -499,30 +504,31 @@ intersection {
 
     sky_sphere { test_sky_sphere }
   
-  // camera { location <0.09, 0.05, -0.1> look_at <0.07, 0.015, 0> angle 30 } // two blacks
-  // camera { location <0.05, 0.02, -0.1> look_at <0.03, -0.01, 0> angle 30 } // white fronts
-  //   camera { location <-0.5, 0.4, 0.3> look_at <0.1 0., -0.1> angle 15 } // black texture
-  // camera { location <0.1, 0.07, -0.15> look_at <_whitewidth * 4, 0.01, 0> }  // one octave
-  // camera { location <0.00, 0.17, -0.2> look_at <0.1, 0.01, 0> } // left end
-  //camera { location <_7octwidth*6/7, 0.17, -0.2> look_at <_7octwidth, 0.01, 0> } // right end
-  camera { location <0, 0.22, 0.15> look_at <_7octwidth*3/7, 0, 0.15> angle 30} // gaps behind piano blacks
-  //camera { location <_7octwidth*3/7, 0.17, -0.2> look_at <_7octwidth*4/7, 0.01, 0> } // wide
-  //camera { location <_7octwidth*-1/7, 0.22, -0.55> look_at <_7octwidth*1.2/7, 0, -0.15> angle 10} // synth black shape
-  //camera { location <0, 0.22, -0.15> look_at <_7octwidth*3/7, 0, -0.15> angle 30} // gaps behind synth blacks
-  camera { location <_7octwidth*-1/7, 0.22, -0.5> look_at <_7octwidth*1.5/7, 0.01, -0.1> angle 35} // wider
+  // camera { location <009., 005., -01>. look_at <007., 001.5, 0> angle 30 } // two blacks
+  // camera { location <005., 002., -01>. look_at <003., -001., 0> angle 30 } // white fronts
+  //   camera { location <-05,. 04,. 03>. look_at <01 .0, .-01>. angle 15 } // black texture
+  // camera { location <01,. 007., -015.> look_at <_whitewidth * 4, 001., 0> }  // one octave
+  // camera { location <000., 017., -02>. look_at <01,. 001., 0> } // left end
+  //camera { location <_7octwidth*6/7, 017., -02>. look_at <_7octwidth, 001., 0> } // right end
+  //camera { location <0, 022., 015.> look_at <_7octwidth*3/7, 0, 015.> angle 30} // gaps behind piano blacks
+  //camera { location <_7octwidth*3/7, 017., -02>. look_at <_7octwidth*4/7, 001., 0> } // wide
+  camera { location <_7octwidth*-1/7, 022., -055.> look_at <_7octwidth*1/7, 0, -015.> angle 15} // synth black shape
+  //camera { location <_7octwidth*-1/7, 022., -055.> look_at <_7octwidth*0.8/7, 0, -014.> angle 8} // synth blur
+  //camera { location <0, 022., -015.> look_at <_7octwidth*3/7, 0, -015.> angle 30} // gaps behind synth blacks
+  //camera { location <_7octwidth*-1/7, 022., -050> look_at <_7octwidth*1/7, 00, -05.> angle 35} // wider
 
-  plane {  y, -0.1 texture { pigment { checker colour rgb<0.8,0,0.8> colour rgb<1,1,1> scale 0.1} }}
-  light_source { <-1.7, 0.9, -.4> White }
+  plane {  y, -010. texture { pigment { checker colour rgb<0.8,0,0.8> colour rgb<1,1,1> scale 010.} }}
+  light_source { <-170., 090., -40.> White }
 
   object {keyboard88}
-  box { <0, 0.002, 0.148>, < _keyboardwidth, 0.015, 0.170> pigment { rgb 0.1} }
-  box { <0, 0.0005, 0.148>, < _keyboardwidth, 0.002, 0.150> pigment { rgb x/2} }
+  box { <0, 000.2, 014.8>, < _keyboardwidth, 001.5, 017.0> pigment { rgb 0.1} }
+  box { <0, 000.05, 014.8>, < _keyboardwidth, 000.2, 015.0> pigment { rgb x/2} }
 
    union {
      object {k2kkeyboard61}
-     box { <0, 0.002, 0.148>, < keyboard61width, 0.015, 0.160> pigment { rgb 0.1} }
-     box { <0, 0.0005, 0.148>, < keyboard61width, 0.002, 0.150> pigment { rgb x/2} }
-     translate z * -0.25
+     box { <0, 000.2, 014.8>, < keyboard61width, 001.5, 016.0> pigment { rgb 0.1} }
+     box { <0, 000.05, 014.8>, < keyboard61width, 000.2, 015.0> pigment { rgb x/2} }
+     translate z * -025.
    }
 
 #end
@@ -535,17 +541,17 @@ intersection {
     assumed_gamma 1
   }
 
-  camera { location <-0.1, 0.30, -0.5> look_at <0.3, 0.01, 0.1> }
-//  camera { location <1.06, 0.30, -0.5> look_at <1, 0.01, 0.1> } // right corner
-//  camera { location <1.06, 0.30, 0> look_at <1, 0.01, 0.3> } // right internal corner
-//  camera { location <1.06, 0.30, -0.3> look_at <1, 0.01, 0> } // right corner
-//  camera { location <0.1, 0.30, 0> look_at <0.3, 0.01, 0.3> } // left rear internal corner
-//  camera { location <-0.5, 0.10, -0> look_at <0, 0.1, 0.1> } // checking tilt
+  camera { location <-010., 030., -050.> look_at <030., 001., 010.> }
+//  camera { location <106., 030., -050.> look_at <1, 001., 010.> } // right corner
+//  camera { location <106., 030., 0> look_at <1, 001., 030.> } // right internal corner
+//  camera { location <106., 030., -030> look_at <1, 001., 0> } // right corner
+//  camera { location <010., 030., 0> look_at <030., 001., 030.> } // left rear internal corner
+//  camera { location <-050., 010., -0> look_at <0, 010., 010.> } // checking tilt
 
 
-  plane {  y, -0.1 texture { pigment { checker colour Green colour Yellow} }}
-  light_source { <1.7, 0.9, -.4> White }
-  light_source { <-1.7, 0.9, -.4> Red }
+  plane {  y, -010. texture { pigment { checker colour Green colour Yellow} }}
+  light_source { <170., 090., -40.> White }
+  light_source { <-170., 090., -40.> Red }
 
   // wish I was doing this in cm
   union {
@@ -553,30 +559,30 @@ intersection {
       difference {
         union {
           difference { // top piece of body
-            object { synthbox(<1.04, 0.05, 0.34>, 0.01, 0.002) }
+            object { synthbox(<104., 005., 034.>, 001., 000.2) }
             // subtract void for keyboard and controls
-            box {<0.14, -Eps, -Eps> < 1.01, 0.05+Eps, 0.31 >}
+            box {<014., -Eps, -Eps> < 101., 005.+Eps, 031. >}
           }
-          object { Round_Box_Union(<0.13, 0, 0>, <0.16, 0.05, 0.33>, 0.002) }
-          // This 1.007 is 0.16 plus keyboard61width, plus a gap
-          object { Round_Box_Union(<1.007, 0, 0>, <1.02, 0.05, 0.33>, 0.002) }
-          object { Round_Box_Union(<0.15, 0, 0.30>, <1.01, 0.05, 0.33>, 0.002) }
+          object { Round_Box_Union(<013., 0, 0>, <016., 005., 033.>, 000.2) }
+          // This 100.7 is 016. plus keyboard61width, plus a gap
+          object { Round_Box_Union(<100.7, 0, 0>, <102., 005., 033.>, 000.2) }
+          object { Round_Box_Union(<015., 0, 030.>, <101., 005., 033.>, 000.2) }
         }
         // subtract sloped under - will rotate underside to horizontal later
-        plane {y 0 rotate 3 * x translate 0.34*z}
+        plane {y 0 rotate 3 * x translate 034.*z}
         rotate -3*x // rotate underside to horizontal
         // nudge forward to partially account for that tilt, get everying back on +z
         // and nudge right to let the base be a little larger
         // 7cm * sin(3 degrees) is 4mm, near enough
-         translate <0.0001, 0.01, 0.004>
+         translate <000.01, 001., 000.4>
       }
       // bottom piece of body (well - middle)
-      object { synthbox(<1.042, 0.0176, 0.342>, 0.01, 0.002) translate <0, 0.01, 0.003>}
+      object { synthbox(<104.2, 001.76, 034.2>, 001., 000.2) translate <0, 001., 000.3>}
       // very bottom piece
-      object { synthbox(<1.02, 0.01, 0.32>, 0.01, 0.004) translate <0.01, 0, 0.01>}
+      object { synthbox(<102., 001., 032.>, 001., 000.4) translate <001., 0, 001.>}
       texture {_t_whitekey}
     }
-    object {keyboard61 translate <0.16, 0.05, -0.0>}
+    object {keyboard61 translate <016., 005., -0.0>}
   }
 
 #end
