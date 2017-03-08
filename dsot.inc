@@ -308,7 +308,7 @@
 	average texture_map {
 	  #local i=_n; #while (i)
 	    [ 1 pigment { pigm }
-	      normal {bozo 1 translate <rand(bseed),rand(bseed),rand(bseed)> scale 0.0001}
+	      normal {bozo 1 translate <rand(bseed),rand(bseed),rand(bseed)>*100 scale 0.0001}
 	      finish { fin }
 	    ]
 	    #local i=i-1; #end
