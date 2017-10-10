@@ -538,8 +538,10 @@
   #end
 
   //####################################################################
-  // Wrote this before finding Interpolate().
+  // Animate gently between 0 and 1
+  // Wrote this before finding Interpolate().  Or before Interpolate was.
   #macro softly(in)
+    #warning "you were going to improve softly() in dsot.inc."
     #if (in > 1)
       #if (in < 1.00001)
 	// Bloody epsilon
@@ -556,6 +558,20 @@
       0.5+0.5*(sind(90*in) - sind(45)) / (1-sind(45))
     )
   #end
+
+  // here it is, improved
+  //####################################################################
+  // Returns [0,1] for input [0,1].  Returns 0.5 for input 0.5.
+  // But it is an S-shape in between.
+  // I use it in the spirals to avoid sudden gradient changes at the ends.
+  #declare softly_improved = function(in) {
+    select(in-0.5,
+      0.5*(1-cosd(90*in))/(1-sind(45)),                            // in < 0.5
+      0.5+0.5*(sind(90*(min(in,1))) - sind(45)) / (1-sind(45))      // in >= 0.5
+    )
+  }
+
+
 
   //####################################################################
   // whitespline: simulate a lighting curve, from black at t=0 to white
@@ -778,6 +794,7 @@
     light_source {<-0.3, 3, -3>, White spotlight point_at y}
   #end
   
+  #declare TEST_SOFTLY = 1;
   #ifdef (TEST_SOFTLY)
     camera { location <0.5, 0.5, -2> look_at <0.5, 0.5, 0> }
     cylinder {0, x, 0.003 finish { ambient 1 } pigment {rgb z}}
@@ -786,7 +803,7 @@
     cylinder {y, x+y, 0.003 finish { ambient 1 } pigment {rgb z}}
     #local i = 0;
     #while (i <= 1)
-      sphere {<i, softly(i), -0.01>, 0.005 finish { ambient 1 } pigment {rgb y}}
+      sphere {<i, softly_improved(i), -0.01>, 0.005 finish { ambient 1 } pigment {rgb y}}
       sphere {<i, Interpolate(i, 0, 1, 0, 1, 0), -0.02>, 0.005 finish { ambient 1 } pigment {rgb z}}
       sphere {<i, -0.01, 0> 0.005 finish {ambient 1} pigment {rgb whitespline(i)}}
       #warning concat(str(i, 2, 2),
