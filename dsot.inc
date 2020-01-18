@@ -1,3 +1,8 @@
+/* (c) 1988-2020 Andrew Donkin.
+ * This work is licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License.
+ * To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/
+ */
 
 #version 3.7;
 #ifndef(DSOT_INC)
@@ -809,16 +814,6 @@
   
   //######################################################################
 
-//  #declare TEST_SYNTHBOX=1;
-  #ifdef (TEST_SYNTHBOX)
-    camera { location <-0.5, 1, -2> look_at <0.5, 0.5, 0>}
-    object {synthbox (<2, 0.6, 2>, 0.2, 0.02)
-      pigment {rgb 0.5}
-    }
-    plane {  y, 0 texture { pigment { checker colour Green colour Yellow} }}
-    light_source {<-0.3, 3, -3>, White spotlight point_at y}
-  #end
-  
 //  #declare TEST_BENDYLIGHT = 1;
   #ifdef (TEST_BENDYLIGHT)
 //    camera {location <-0.4, 0.3, -0.3> look_at <0, 0.2, 0> angle 30}

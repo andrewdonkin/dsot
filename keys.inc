@@ -1,4 +1,5 @@
-/* This work is licensed under the
+/* (c) 1988-2020 Andrew Donkin.
+ * This work is licensed under the
  * Creative Commons Attribution-ShareAlike 4.0 International License.
  * To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/
  */
@@ -494,7 +495,7 @@ intersection {
   }
 }
 
-#if (1)
+#if (0)
   global_settings {
     // ambient_light 0
     // ambient_light 0 radiosity {  }
@@ -533,7 +534,7 @@ intersection {
 
 #end
 
-#if (0)
+#if (1)
   global_settings {
     // ambient_light 1
     // ambient_light 0 radiosity {  }
@@ -582,7 +583,7 @@ intersection {
       object { synthbox(<102., 001., 032.>, 001., 000.4) translate <001., 0, 001.>}
       texture {_t_whitekey}
     }
-    object {keyboard61 translate <016., 005., -0.0>}
+    object {k2kkeyboard61 translate <016., 005., -0.0>}
   }
 
 #end
