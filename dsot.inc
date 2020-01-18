@@ -539,38 +539,63 @@
 
   //####################################################################
   // Animate gently between 0 and 1
-  // Wrote this before finding Interpolate().  Or before Interpolate was.
+  // Returns [0,1] for input [0,1].  Returns 0.5 for input 0.5.
+  // But it is an S-shape in between.
+  // Wrote this years ago before finding Interpolate().  Or before Interpolate was.
+  // This clamps input to [0,1] but Interpolate is a lot easier to understand.
+  // This is slightly steeper.
   #macro softly(in)
-    #warning "you were going to improve softly() in dsot.inc."
-    #if (in > 1)
-      #if (in < 1.00001)
-	// Bloody epsilon
-	#local in = 1;
-      #else
-	#error concat("Bad softly parameter ", str(in,0,0))
-      #end
-    #end
-    #if (in < 0)
-      #error concat("Bad softly parameter ", str(in,0,0))
-    #end
     select(in-0.5,
-      0.5*(1-cosd(90*in))/(1-sind(45)),
-      0.5+0.5*(sind(90*in) - sind(45)) / (1-sind(45))
+      0.5*(1-cosd(90*max(in,0)))/(1-sind(45)),                    // in < 0.5
+      0.5+0.5*(sind(90*min(in,1)) - sind(45)) / (1-sind(45))      // in >= 0.5
     )
   #end
 
-  // here it is, improved
-  //####################################################################
-  // Returns [0,1] for input [0,1].  Returns 0.5 for input 0.5.
-  // But it is an S-shape in between.
+  // Same as softly(), now.
   // I use it in the spirals to avoid sudden gradient changes at the ends.
   #declare softly_improved = function(in) {
     select(in-0.5,
-      0.5*(1-cosd(90*in))/(1-sind(45)),                            // in < 0.5
-      0.5+0.5*(sind(90*(min(in,1))) - sind(45)) / (1-sind(45))      // in >= 0.5
+      0.5*(1-cosd(90*max(in,0)))/(1-sind(45)),                    // in < 0.5
+      0.5+0.5*(sind(90*min(in,1)) - sind(45)) / (1-sind(45))      // in >= 0.5
     )
   }
-
+  // Another go.  Always goes through the origin, (0.5,0.5), and (1,1).
+  // Linear if Power==1.  Very steep at Power=4.
+  // If Power < 1, has the opposite of the desired effect:  starts and
+  // ends like a rocket with a long flat bit in the middle.
+  // Like a Michael Chrichton book.
+  // If Power == 2, practically identical to Interpolate(0) and softly().
+  #declare softly_3 = function(in, Power) {
+    select(in, 0, 0,
+      select(1-in, 1, 1,
+        select(in-0.5,
+          pow(2*in, Power),          // in < 0.5
+          1,
+          2-pow(2*(1-in), Power)     // in > 0.5
+        )/2
+      )
+    )
+  }
+  // (in, out) always goes through (0,0), (0.5,1), (1,0)
+  
+  // Like a bell curve but steeper.  Three straight lines, not differentiable.
+  // Attack < Decay < 1.
+  // Unused.
+  #declare SharpBell = function(in, Attack, Decay) {
+    select(in, 0, 0,
+    //  select(1-in, 0, /* SLOW */ /* ,0 even slower.  What is it with select? */
+      select(in-Attack,
+        in/Attack,
+        1,
+        select(in-Decay, 1, 1, 1-(in-Decay)/(1-Decay))
+      )
+    //    )
+    )
+  }
+  //#declare SoftlyP2_slow_do_not_use = function(in, Power) {
+  //    (in<0.5) * pow(2*max(0, in), Power)/2          // in < 0.5
+  //    + (in >=0.5) * (2-pow(2*(1-min(1,in)), Power))/2     // in >= 0.5
+  //}
 
 
   //####################################################################
@@ -786,7 +811,7 @@
 
 //  #declare TEST_SYNTHBOX=1;
   #ifdef (TEST_SYNTHBOX)
-    camera { location <-0.5, 1, -2> look_at <0.5, 0.5, 0> }
+    camera { location <-0.5, 1, -2> look_at <0.5, 0.5, 0>}
     object {synthbox (<2, 0.6, 2>, 0.2, 0.02)
       pigment {rgb 0.5}
     }
@@ -794,27 +819,6 @@
     light_source {<-0.3, 3, -3>, White spotlight point_at y}
   #end
   
-  #declare TEST_SOFTLY = 1;
-  #ifdef (TEST_SOFTLY)
-    camera { location <0.5, 0.5, -2> look_at <0.5, 0.5, 0> }
-    cylinder {0, x, 0.003 finish { ambient 1 } pigment {rgb z}}
-    cylinder {0, y, 0.003 finish { ambient 1 } pigment {rgb z}}
-    cylinder {x, x+y, 0.003 finish { ambient 1 } pigment {rgb z}}
-    cylinder {y, x+y, 0.003 finish { ambient 1 } pigment {rgb z}}
-    #local i = 0;
-    #while (i <= 1)
-      sphere {<i, softly_improved(i), -0.01>, 0.005 finish { ambient 1 } pigment {rgb y}}
-      sphere {<i, Interpolate(i, 0, 1, 0, 1, 0), -0.02>, 0.005 finish { ambient 1 } pigment {rgb z}}
-      sphere {<i, -0.01, 0> 0.005 finish {ambient 1} pigment {rgb whitespline(i)}}
-      #warning concat(str(i, 2, 2),
-	": <", str(whitespline(i).x, 2, 2),
-	",", str(whitespline(i).y, 2, 2),
-	",", str(whitespline(i).z, 2, 2),
-	">")
-      
-      #local i = i + 0.02;
-    #end
-  #end
 //  #declare TEST_BENDYLIGHT = 1;
   #ifdef (TEST_BENDYLIGHT)
 //    camera {location <-0.4, 0.3, -0.3> look_at <0, 0.2, 0> angle 30}
