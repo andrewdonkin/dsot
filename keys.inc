@@ -495,6 +495,16 @@ intersection {
   }
 }
 
+
+#if (1)
+camera { location <-0.5, 1, -2> look_at <0.5, 0.5, 0>}
+object {synthbox (<2, 0.6, 2>, 0.2, 0.02)
+ pigment {rgb 0.5}
+}
+plane {  y, 0 texture { pigment { checker colour Green colour Yellow} }}
+light_source {<-0.3, 3, -3>, White spotlight point_at y}
+#end
+
 #if (0)
   global_settings {
     // ambient_light 0
@@ -534,7 +544,7 @@ intersection {
 
 #end
 
-#if (1)
+#if (0)
   global_settings {
     // ambient_light 1
     // ambient_light 0 radiosity {  }

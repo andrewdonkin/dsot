@@ -39,6 +39,8 @@
   #local holewidth = boxwidth / 4;
   #local holeheight = boxheight / 9;
   
+  #local _dalek_metal_t = texture {pigment {Gray20} finish {specular 1 metallic}};
+  
   union {
     
     // Sides and lightbox combined, translated +z
@@ -93,7 +95,7 @@
 		  texture{pigment{colour rgb 0.9} finish {reflection {0}}}
 		  #warning "Non-reflective, non-blurred Dalek sides"
 	    #else
-		  blurred_tm(pigment{colour rgb 0.9}, finish {reflection {0.2 exponent 0.9 falloff 2}}, )
+		  blurred_tm(pigment{colour rgb 0.2}, finish {reflection {0.2 exponent 0.9 falloff 2}}, )
 	    #end
 	    }
 	  }
@@ -183,6 +185,7 @@
 	    #end // while
 	    texture { pigment { colour rgb <0.5, 0.5, 0.5> }
 	      finish { specular 0.5 roughness 0.01 reflection 0.2 }
+	      normal {dents 0.05 scale 0.01} // has to be a little bit dented
 	    }
 	  }
 	  
@@ -300,21 +303,22 @@
 	    // They will interact with environmental media, if there is any.
 	    light_source {
 	      #if (NO_DALEK_CHOPSTICKS)
-		#if(1)
+		#if(0)
 		  <0, 0, -lightsource_backoff(holeheight/2, 1)>
 		  colour colr*2
 		  projected_through {disc {0, z, holeheight/2}}
 		#else
-		  <0, 0, 0.01>
-		  colour colr
+		  <0, 0, .01>
+		  colour colr*2
 		#end
 	      #else 
-		<0, 0, 2.03>
-		colour colr*10
+		<0, 0, 0.0>
+	        colour colr*2 
+	        projected_through {disc {z*2.1, z, holeheight}} // use this to get them past the tubes of media
 	      #end
 	      spotlight radius 0.3 falloff 1
 	      #if(! NO_AREA_LIGHTS) area_light 0.05*y, 0.05*x, 6, 6 adaptive 1 #end
-	      point_at z
+	      point_at z*10 // if chopsticks are on, the light sources are at z=2.03
 	      rotateit()
 	      // Box containing scattering media extends to z=boxdepth/2+0.01
 	      translate <-boxwidth/2 + holexgap + holewidth/2, loopy+holeheight/2, boxdepth/2>
@@ -391,6 +395,7 @@
 		      //		samples 4,100
 		    }
 		  }
+		  no_shadow
 		  rotateit()
 		  translate <-boxwidth/2 + holexgap + holewidth/2, loopy+holeheight/2, boxdepth/2>*<side,1,1>
 		}
@@ -410,19 +415,21 @@
        * Pitching the lightbox breaks them somewhat.
        * Omit: they are not on the real thing
        */
-      // #include "dalekcables.inc"
+      #ifndef(DALEK_CHEAP_TEXTURES)
+        #include "dalekcables.inc"
+      #end
       translate 0.15 * z
       rotate (180+rot)*y
     }
 
     // More cables, from the plinth running down the riser.  Not rotated.
-    #include "dalekplinthcables.inc"
+    //#include "dalekplinthcables.inc"
     
     /**********************************************************************
      * Build a stack of 12 discs, alternating white and black, to a
      * total thickness of plinththick metres, then (don't) cut a hole in the top
      */
-//    difference {
+    difference {
       union {
         #local darkdisc_t = texture{pigment{colour rgb <0.2, 0.2, 0.2>}
 	  normal { bumps 0.0002
@@ -440,7 +447,7 @@
 	  #local i = i - 1;
 	  union {
 	    cylinder {
-	      0, -plinththick/6 * 2/3 * y, plinthradius
+	      0, -plinththick/6 * 2/3 * y, plinthradius+0.002
 	      texture {lightdisc_t}
 	    }
 	    cylinder {
@@ -451,7 +458,7 @@
 	  }
 	  union {
 	    cylinder {
-	      0, plinththick/6 * 2/3 * y, plinthradius
+	      0, plinththick/6 * 2/3 * y, plinthradius+0.002
 	      texture {lightdisc_t}
 	    }
 	    cylinder {
@@ -462,21 +469,22 @@
 	  }
 	#end // while
       }
-  // This was a hole for the cables, now deleted, to disappear into.
-  //      cylinder {plinththick/2*y, (plinththick+0.001)*y, plinthradius/4 pigment {rgb 0}}
-//    }
+      // This was a hole for the cables, now deleted, to disappear into.
+      // Reinstated because it adds interest
+      cylinder {plinththick/2*y, (plinththick+0.001)*y, plinthradius/4 texture{lightdisc_t}}
+    }
     // Now for the vertical that this thing rises on.
     // See 128068354SbVjpY_ph.jpg
     object {
       softboxh(<plinthradius*1.4, plinththick/5-0.015, plinthradius*1.3>, 0.05)
       translate <0, -(plinththick/5-0.015)/2-0.015, plinthradius-(plinthradius*1.3/2)>
+      texture {_dalek_metal_t}
     }
     box {<-plinthradius*0.7, -0.015, -plinthradius/3>,
       <plinthradius*0.7, 0, plinthradius>
-      texture {grille_t}
+      texture {darkdisc_t}
     }
     union {
-      difference {
 	union {
 	  #if (0) 
 	    superellipsoid {<0.7, 0.05>	// cylinder along Z
@@ -494,25 +502,28 @@
 	      scale <0.103, 3, 0.1>
 	      translate <0, -3, plinthradius-0.05>  }
 	  #else
-	    Round_Cylinder_Union(<-0.103, 0.005, plinthradius-0.05>, <0.103, 0.005, plinthradius-0.05>,
-	      0.1, 0.005)
-	    Round_Cylinder_Union(<-0.1, -0.05, plinthradius>, <0.1, -0.05, plinthradius>,
-	      0.1, 0.005)
-	    Round_Box_Union(<-0.1, -6, plinthradius-0.1>, <0.1, -0.0495, plinthradius+0.1>, 0.005)
+	    intersection {
+	    	Round_Cylinder_Union(<-0.103, 0.005, plinthradius-0.05>, <0.103, 0.005, plinthradius-0.05>,
+	          0.1, 0.005)
+	        box {<-0.2, 0, 0>, <0.2, 1, 1>}
+	    }
+	    intersection {
+                Round_Cylinder_Union(<-0.1, -0.05, plinthradius>, <0.1, -0.05, plinthradius>,
+	          0.1, 0.005)
+	        box {<-0.2, -0.06, 1>, <0.2, 0.06, 0>}
+	        }
+	    Round_Box_Union(<-0.1, -6, plinthradius-0.01>, <0.1, -0.0495, plinthradius+0.1>, 0.005)
 	    Round_Box_Union(<-0.103, -6, plinthradius>, <0.103, 0.005, plinthradius+0.05>, 0.005)
 	  #end
 	}
-	box {<-0.2, 0, plinthradius>, 
-	  <0.2, -7, 0>
-	}
-      }
+      // supporting bracket
       intersection {
 	superellipsoid {<0.1, 0.25> scale <0.1, 0.03, 100>}
 	box {<-1, -1, plinthradius*1.42>, <1, 1, 0>}
 	translate 0.03*y
 	rotate 45*x
       }
-      texture{grille_t}
+      texture{_dalek_metal_t}
     }
   }
 
