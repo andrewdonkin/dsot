@@ -156,46 +156,36 @@
 	difference {
 	  #local holexgap = (boxwidth - 2*holewidth)/3;
 	  #local holeygap = (boxheight - 4*holeheight)/5;
-	  union {
+	  merge {
 	    // The big box
 	    Round_Box_Union(<-boxwidth/2, 0, -boxdepth/2>,
 	      <boxwidth/2, boxheight, boxdepth/2>, 0.002)
 	    // Plus eaves that will be over each hole, when they're cut later.
-	    #local i = 4;
-	    #while (i)
-	      #local i = i - 1;
-	      #local loopx = -boxwidth/2 + holexgap;
+            #local loopx = -boxwidth/2 + holexgap;
+            #for (i, 0, 3)
 	      #local loopy = (holeygap+holeheight)*i + holeygap;
-	      #local side = 1;
-	      #while (side > -2)
+              #for (side, -1, 1, 2)
 		difference {
-		  object { box{
+		  box{
 		    <loopx - 0.006, loopy + holeheight*0.85, boxdepth/2-0.01> * <side,1,1>,
-		    <loopx + 0.006 + holewidth, loopy + holeheight*1.15, boxdepth/2+holeheight/4>*<side,1,1>
+		    <loopx + 0.006 + holewidth, loopy + holeheight*1.18, boxdepth/2+holeheight/4>*<side,1,1>
 		    }
-		  }
+
 		  cylinder {
 		    <loopx - 0.007, loopy+holeheight*0.8, boxdepth/2 + holeheight/4> * <side, 1, 1>,
 		    <loopx + 0.007 + holewidth, loopy+holeheight*0.8, boxdepth/2 + holeheight/4>*<side,1,1>
 		    holeheight/4
 		  }
 		}
-		#local side = side - 2;
-	      #end // while
-	    #end // while
-	    texture { pigment { colour rgb <0.5, 0.5, 0.5> }
-	      finish { specular 0.5 roughness 0.01 reflection 0.2 }
-	      normal {dents 0.05 scale 0.01} // has to be a little bit dented
-	    }
+	      #end // for side = -1, 1
+	    #end // for i = 0-3
+            blurred_tm(pigment { colour rgb <0.5, 0.5, 0.5> }, finish {phong 1 phong_size 300 reflection 0.4}, )
 	  }
 	  
 	  // Eight holes.
-	  #local i = 4;
-	  #while (i)
-	    #local i = i - 1;
+          #for (i, 0, 3)
 	    #local loopy = (holeygap+holeheight)*i + holeygap;
-	    #local side = 1;
-	    #while (side > -2)
+            #for (side, -1, 1, 2)
 	      // cut the holes all the way through.
 	      object {Round_Box_Union(
 		<-holewidth/2, -holeheight/2, -boxdepth/2-0.01>,
@@ -208,7 +198,6 @@
 		translate <-boxwidth/2+holexgap+holewidth/2, loopy+holeheight/2, 0>
 		* <side, 1, 1>
 	      }
-	      #local side = side - 2;
 	    #end // while
 	  #end // while
 	}
@@ -230,22 +219,21 @@
 	  #end
 	#end
 	
-	// Now fill those eight holes will glorious light
-	#local i = 4;
-	#while (i)
-	  #local i = i - 1;
+	// Now fill those eight holes will glorious light,
+        // and let them emit it
+        #for (i, 0, 3)
 	  #local loopy = (holeygap+holeheight)*i + holeygap;
 	  #if (i > 1)
 	    #local colr=lightcolour1;
 	  #else
 	    #local colr=lightcolour2;
 	  #end
-	  #local side = 1;
-	  #while (side > -2)
+	  #for (side, -1, 1, 2)
 	    union {
+              // This makes it look like there is a bright light inside the hole
 	      object {Round_Box_Merge(
 		<-holewidth/2, -holeheight/2, -boxdepth/2+0.01>,
-		<holewidth/2, holeheight/2, boxdepth/2+0.03>, 0.01)
+		<holewidth/2, holeheight/2-0.002, boxdepth/2+0.03>, 0.03)
 		texture { pigment {color rgbt 1} finish {ambient 0 diffuse 0} }
 		hollow interior {
 		  media { emission 6
@@ -270,7 +258,6 @@
 	      sphere {0, holeheight/2.2
 		texture {
 		  finish {ambient 1 diffuse 0 reflection 0.0}
-//		  pigment {rgbt <colr.red, colr.green, colr.blue, 0.1>*5}
 		  pigment {rgbt <1, 1, 1, 1>}
 		}
 		interior {ior 1.3}
@@ -281,65 +268,54 @@
 		translate (boxdepth/2-holeheight/2-0.04)*z
 	      }
 	      translate <-boxwidth/2+holexgap+holewidth/2, loopy+holeheight/2, 0> * <side,1,1>
-	    }
-	    #local side = side - 2;
-	  #end
-	#end
-	    
-	#if(1)
-	// The real light sources.
-	#for (i, 0, 3, 1)
-	  #if (i > 1)
-	    #local colr=lightcolour1;
-	  #else
-	    #local colr=lightcolour2;
-	  #end
-	  #local loopy = (holeygap+holeheight)*i + holeygap; // + plinththick + boxplinthsep;
-#for (side, 1, -1, -2)
-	    // This source creates small illuminated circles on objects they strike.
-	    // They will interact with environmental media, if there is any.
-	    light_source {
+	    } // union of the internal media, lens, and back black box
+        
+            // This source creates small illuminated circles on objects they strike.
+            // They will interact with environmental media, if there is any.
+            light_source {
 	      #if (NO_DALEK_CHOPSTICKS)
 		#if(0)
 		  <0, 0, -lightsource_backoff(holeheight/2, 1)>
-		  colour colr*2
+		  colour colr
 		  projected_through {disc {0, z, holeheight/2}}
 		#else
 		  <0, 0, 0>
-		  colour colr*2
+		  colour colr
 		#end
 	      #else 
 		<0, 0, 0.0>
-	        colour colr*2 
-	        projected_through {disc {z*2.1, z, holeheight}} // use this to get it past the tubes of media.  Disc size irrelevant
+	        colour colr 
+                // project through a disc beyond the tubes of media.
+                // Disc size irrelevant while the spot is expanding at 1 degree
+	        projected_through {disc {z*2.1, z, holeheight }}
 	      #end
-	      spotlight radius 0.3 falloff 1  // a one-degree spot
+	      spotlight radius 0.5 falloff 1  // a one-degree spot
 	      #if(! NO_AREA_LIGHTS) area_light 0.05*y, 0.05*x, 6, 6 adaptive 1 #end
 	      point_at z*10 // if chopsticks are on, the light sources are at z=2.03
 	      rotateit()
-	      // Box containing scattering media extends to z=boxdepth/2+0.01
+	      // Box containing internal scattering media extends to z=boxdepth/2+0.01
 	      translate <-boxwidth/2 + holexgap + holewidth/2, loopy+holeheight/2, boxdepth/2>
-	      * <side,1,1>
+                * <side,1,1>
 	    }
-	  #end
-	#end
-	#end
-
+        
+	  #end // for side = -1, 1
+	#end // for i = 0-3
+	    
 	#if (NO_DALEK_CHOPSTICKS)
 //	  #warning "Not rendering Dalek chopsticks!"
-	#else
-	  light_group {
-            #for (i, 0, 3, 1)
-	      #if (i > 1)
+        #else
+          light_group {
+            #for (i, 0, 3)
+              #if (i > 1)
 		#local colr=lightcolour1*7;
 	      #else
 		#local colr=lightcolour2*7;
 	      #end
 	      #local loopy = (holeygap+holeheight)*i + holeygap;
-              #for (side, 1, -1, -2)
+              #for (side, -1, 1, 2)
 		// Now a nearly-identical light source that only produces "laser beams"
 		// inside a box of media protuding from the dalek like chopsticks.
-		// Actually they shine from <0,0,2z> into the unit, so that they flow
+		// Actually they shine from <0,0,2> into the unit, so that they flow
 		// right into the rectangular holes.
 		light_source {
 		  2*z
@@ -352,18 +328,8 @@
 		  rotateit()
 		  translate <-boxwidth/2 + holexgap + holewidth/2, loopy+holeheight/2, boxdepth/2>*<side,1,1>
 		}
-	      #end
-	    #end
-            #for (i, 0, 3, 1)
-	      #if (i > 1)
-		#local colr=lightcolour1*7;
-	      #else
-		#local colr=lightcolour2*7;
-	      #end
-	      #local loopy = (holeygap+holeheight)*i + holeygap;
-              #for (side, 1, -1, -2)
 		cylinder {
-		  0.01*z, 2*z,
+		  0.03*z, 2*z, // 2m long.  Internal glowing media sticks out 3cm, artefacts if they overlap.
 		   holeheight/2+0.01 texture { pigment {rgbt 1} finish {ambient 0 diffuse 0}}
 //		  0.005 texture { pigment {colr} finish {ambient 2 diffuse 1}}
 		  hollow
@@ -376,8 +342,8 @@
 		      }
 		      // This light is pointing into the dalek, and I want
 		      // it to get brighter as it moves away from its POV source.
-		      // So use negative extintion and eccentricity.
-		      scattering { 4, rgb 1/4 extinction -10}
+		      // So use negative extinction and eccentricity.
+		      scattering { 4, rgb 1 extinction -10}
 		      method 3
 		      //		intervals 8
 		      //		samples 4,100
@@ -387,10 +353,10 @@
 		  rotateit()
 		  translate <-boxwidth/2 + holexgap + holewidth/2, loopy+holeheight/2, boxdepth/2>*<side,1,1>
 		}
-	      #end
-	    #end
-	  }
-	#end			// #if no_dalek_chopsticks
+              #end // for side = -1, 2
+	    #end // for i = 0-3
+	  } // light_group
+	#end			// #if no_dalek_chopsticks else
 	translate -boxheight/2 * y
 	rotate x*boxpitch
 	translate boxheight/2 * y
@@ -402,7 +368,7 @@
        * Pitching the lightbox breaks them somewhat.
        * Omit: they are not on the real thing
        */
-      #ifndef(DALEK_CHEAP_TEXTURES)
+      #ifdef(DALEK_CHEAP_TEXTURES)
         #include "dalekcables.inc"
       #end
       translate 0.15 * z
@@ -410,7 +376,7 @@
     }
 
     // More cables, from the plinth running down the riser.  Not rotated.
-    //#include "dalekplinthcables.inc"
+    #include "dalekplinthcables.inc"
     
     /**********************************************************************
      * Build a stack of 12 discs, alternating white and black, to a
@@ -458,7 +424,7 @@
       }
       // This was a hole for the cables, now deleted, to disappear into.
       // Reinstated because it adds interest
-      cylinder {plinththick/2*y, (plinththick+0.001)*y, plinthradius/4 texture{lightdisc_t}}
+      cylinder {(plinththick-0.01)*y, (plinththick+0.001)*y, plinthradius/4 texture{darkdisc_t}}
     }
     // Now for the vertical that this thing rises on.
     // See 128068354SbVjpY_ph.jpg
