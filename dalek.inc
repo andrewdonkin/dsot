@@ -288,17 +288,14 @@
 	    
 	#if(1)
 	// The real light sources.
-	#local i =4;
-	#while (i >= 1)
-	  #local i = i - 1; // !!! 1
+	#for (i, 0, 3, 1)
 	  #if (i > 1)
 	    #local colr=lightcolour1;
 	  #else
 	    #local colr=lightcolour2;
 	  #end
 	  #local loopy = (holeygap+holeheight)*i + holeygap; // + plinththick + boxplinthsep;
-	  #local side = 1;// !!! 1
-	  #while (side > -2)
+#for (side, 1, -1, -2)
 	    // This source creates small illuminated circles on objects they strike.
 	    // They will interact with environmental media, if there is any.
 	    light_source {
@@ -308,15 +305,15 @@
 		  colour colr*2
 		  projected_through {disc {0, z, holeheight/2}}
 		#else
-		  <0, 0, .01>
+		  <0, 0, 0>
 		  colour colr*2
 		#end
 	      #else 
 		<0, 0, 0.0>
 	        colour colr*2 
-	        projected_through {disc {z*2.1, z, holeheight}} // use this to get them past the tubes of media
+	        projected_through {disc {z*2.1, z, holeheight}} // use this to get it past the tubes of media.  Disc size irrelevant
 	      #end
-	      spotlight radius 0.3 falloff 1
+	      spotlight radius 0.3 falloff 1  // a one-degree spot
 	      #if(! NO_AREA_LIGHTS) area_light 0.05*y, 0.05*x, 6, 6 adaptive 1 #end
 	      point_at z*10 // if chopsticks are on, the light sources are at z=2.03
 	      rotateit()
@@ -324,8 +321,6 @@
 	      translate <-boxwidth/2 + holexgap + holewidth/2, loopy+holeheight/2, boxdepth/2>
 	      * <side,1,1>
 	    }
-
-	    #local side = side - 2;
 	  #end
 	#end
 	#end
@@ -334,17 +329,14 @@
 //	  #warning "Not rendering Dalek chopsticks!"
 	#else
 	  light_group {
-	    #local i = 4;
-	    #while (i)
-	      #local i = i - 1;
+            #for (i, 0, 3, 1)
 	      #if (i > 1)
 		#local colr=lightcolour1*7;
 	      #else
 		#local colr=lightcolour2*7;
 	      #end
 	      #local loopy = (holeygap+holeheight)*i + holeygap;
-	      #local side = 1;
-	      #while (side > -2)
+              #for (side, 1, -1, -2)
 		// Now a nearly-identical light source that only produces "laser beams"
 		// inside a box of media protuding from the dalek like chopsticks.
 		// Actually they shine from <0,0,2z> into the unit, so that they flow
@@ -360,20 +352,16 @@
 		  rotateit()
 		  translate <-boxwidth/2 + holexgap + holewidth/2, loopy+holeheight/2, boxdepth/2>*<side,1,1>
 		}
-		#local side = side - 2;
 	      #end
 	    #end
-	    #local i = 4;
-	    #while (i)
-	      #local i = i - 1;
+            #for (i, 0, 3, 1)
 	      #if (i > 1)
 		#local colr=lightcolour1*7;
 	      #else
 		#local colr=lightcolour2*7;
 	      #end
 	      #local loopy = (holeygap+holeheight)*i + holeygap;
-	      #local side = 1;
-	      #while (side > -2)
+              #for (side, 1, -1, -2)
 		cylinder {
 		  0.01*z, 2*z,
 		   holeheight/2+0.01 texture { pigment {rgbt 1} finish {ambient 0 diffuse 0}}
@@ -399,7 +387,6 @@
 		  rotateit()
 		  translate <-boxwidth/2 + holexgap + holewidth/2, loopy+holeheight/2, boxdepth/2>*<side,1,1>
 		}
-		#local side = side - 2;
 	      #end
 	    #end
 	  }
